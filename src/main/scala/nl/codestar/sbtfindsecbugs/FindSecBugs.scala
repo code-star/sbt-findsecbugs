@@ -58,7 +58,7 @@ object FindSecBugs extends AutoPlugin {
           runJVMOptions = Vector.empty[String],
           connectInput = true,
           envVars = Map.empty[String, String])
-        
+
         val result = Fork.java(
           forkOptions,
           List("-Xmx1024m", "-cp", classpath, "edu.umd.cs.findbugs.LaunchAppropriateUI", "-textui",

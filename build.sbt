@@ -15,13 +15,10 @@ libraryDependencies += "com.google.code.findbugs" % "findbugs" % "3.0.1"
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1"
 libraryDependencies += "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % "1.6.0"
 
-// Scripted - sbt plugin tests
 
-//import bintray.Keys._
-
-//bintrayPublishSettings
+resolvers += Resolver.jcenterRepo
 
 licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
+
 publishMavenStyle := false
-//repository in bintray := "sbt-plugins"
-//bintrayOrganization in bintray := None
+
