@@ -12,7 +12,7 @@ dependencies:
     - echo "java $SBT_OPTS -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" > $HOME/bin/sbt
     - chmod u+x $HOME/bin/sbt
     - which sbt
-    - sbt sbt-version
+    - sbt sbtVersion
   override:
     - sbt clean test:compile
 test:
