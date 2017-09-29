@@ -8,7 +8,7 @@ dependencies:
   cache_directories:
     - "~/.sbt"
   pre:
-    - wget --output-document=$HOME/bin/sbt-launch.jar https://central.maven.org/maven2/org/scala-sbt/sbt-launch/"$SBT_VERSION"/sbt-launch-"$SBT_VERSION".jar
+    - wget --output-document=$HOME/bin/sbt-launch.jar https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/"$SBT_VERSION"/sbt-launch-"$SBT_VERSION".jar
     - echo "java $SBT_OPTS -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" > $HOME/bin/sbt
     - chmod u+x $HOME/bin/sbt
     - which sbt
