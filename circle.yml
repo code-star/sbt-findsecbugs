@@ -15,6 +15,3 @@ dependencies:
     - sbt sbtVersion
   override:
     - sbt clean test:compile
-test:
-  override:
-    - sbt scripted
