@@ -8,7 +8,7 @@ import Keys._
 object FindSecBugs extends AutoPlugin {
   private val findsecbugsPluginVersion = "1.6.0"
 
-  private val findsecbugsConfig = sbt.config("findsecbugs")
+  private val FindsecbugsConfig = sbt.config("findsecbugs")
   private val FindSecBugsTag = Tags.Tag("findSecBugs")
 
   override def trigger = AllRequirements
@@ -23,7 +23,7 @@ object FindSecBugs extends AutoPlugin {
   override lazy val projectSettings = Seq(
     findSecBugsParallel := true,
     concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
-    ivyConfigurations += findsecbugsConfig,
+    ivyConfigurations += FindsecbugsConfig,
     libraryDependencies ++= Seq(
       "com.google.code.findbugs" % "findbugs" % "3.0.1",
       "com.google.code.findbugs" % "jsr305" % "3.0.1",
@@ -35,22 +35,32 @@ object FindSecBugs extends AutoPlugin {
     def commandLineClasspath(classpathFiles: Seq[File]): String = PathFinder(classpathFiles.filter(_.exists)).absString
     lazy val log = Keys.streams.value.log
     lazy val output = crossTarget.value / "findsecbugs" / "report.html"
-    lazy val findbugsClasspath = Classpaths managedJars (findsecbugsConfig, classpathTypes.value, update.value)
+    lazy val findbugsClasspath = Classpaths managedJars (FindsecbugsConfig, classpathTypes.value, update.value)
     lazy val classpath = commandLineClasspath((dependencyClasspath in Compile).value.files)
     lazy val auxClasspath = commandLineClasspath((dependencyClasspath in Compile).value.files ++ (findbugsClasspath.files filter (_.getName startsWith "jsr305")))
     lazy val ivyHome = ivyPaths(_.ivyHome).value.getOrElse(Path.userHome / ".ivy2")
     lazy val pluginList = s"${ivyHome.absolutePath}/cache/com.h3xstream.findsecbugs/findsecbugs-plugin/jars/findsecbugs-plugin-$findsecbugsPluginVersion.jar"
+    lazy val classDir = (classDirectory in Compile).value
+    lazy val jHome = javaHome.value
 
     IO.createDirectory(output.getParentFile)
     IO.withTemporaryDirectory { tempdir =>
       val includeFile = createIncludesFile(tempdir)
-      val classDir = (classDirectory in Compile).value
 
       if (classDir.exists && !classDir.list().isEmpty) {
         log.info(s"Performing FindSecurityBugs check of '$classDir'...")
         val findBugsLogger = new FindBugsLogger(log)
+        val forkOptions = ForkOptions(
+          javaHome = jHome,
+          outputStrategy = Option(LoggedOutput(findBugsLogger)),
+          bootJars = Vector.empty[java.io.File],
+          workingDirectory = None,
+          runJVMOptions = Vector.empty[String],
+          connectInput = true,
+          envVars = Map.empty[String, String])
+        
         val result = Fork.java(
-          ForkOptions(javaHome = javaHome.value, outputStrategy = Some(LoggedOutput(findBugsLogger))),
+          forkOptions,
           List("-Xmx1024m", "-cp", classpath, "edu.umd.cs.findbugs.LaunchAppropriateUI", "-textui",
             "-exitcode", "-html:plain.xsl", "-output", output.getAbsolutePath, "-nested:true",
             "-auxclasspath", auxClasspath, "-low", "-effort:max", "-pluginList", pluginList,
