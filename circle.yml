@@ -14,4 +14,4 @@ dependencies:
     - which sbt
     - sbt sbtVersion
   override:
-    - sbt clean test:compile
+    - sbt clean test:compile scripted
