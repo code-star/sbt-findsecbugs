@@ -11,6 +11,11 @@ scalacOptions ++= Seq("-encoding", "UTF8", "-Xfatal-warnings",
   "-Ywarn-dead-code", "-Ywarn-adapted-args"
 )
 
+scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+  Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+}
+scriptedBufferLog := false
+
 libraryDependencies += "com.google.code.findbugs" % "findbugs" % "3.0.1"
 libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.1"
 libraryDependencies += "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % "1.7.1"

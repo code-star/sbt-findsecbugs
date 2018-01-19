@@ -1,4 +1,1 @@
-# Tests if an output report is not created upon non existing scan dir
-> findSecBugs
-$ exists global/boot/scala-2.10.6/lib/scala-library.jar
-$ absent target/scala-2.10/findsecbugs/report.html
+> scriptedScalatest

@@ -1,10 +1,19 @@
-name := "simple-test"
+import com.github.daniel.shuy.sbt.scripted.scalatest.ScriptedScalaTestSuiteMixin
+import org.scalatest.WordSpec
 
-version := "0.1.0"
+lazy val root = (project in file("."))
+  .settings(
+    version := "0.1",
+    scalaVersion := "2.10.6",
 
-TaskKey[Unit]("check-os-list") := {
-    //val list = IO.read(target.value / awesomeOsFileName.value)
-    //assert(list contains "Ubuntu", "Ubuntu not present in awesome operating systems: " + list)
-    println("test")
-    assert(true)
-}
+    scriptedScalaTestSpec := Some(new WordSpec with ScriptedScalaTestSuiteMixin {
+      override val sbtState: State = state.value
+
+      "assembly" should {
+        "create a JAR that prints out 'hello'" in {
+          assert(false)
+        }
+      }
+    }
+    )
+  )
