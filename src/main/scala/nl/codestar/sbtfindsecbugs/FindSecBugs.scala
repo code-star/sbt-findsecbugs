@@ -25,8 +25,7 @@ object FindSecBugs extends AutoPlugin {
     concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
     ivyConfigurations += FindsecbugsConfig,
     libraryDependencies ++= Seq(
-      "com.google.code.findbugs" % "findbugs" % "3.0.1",
-      "com.google.code.findbugs" % "jsr305" % "3.0.1",
+      "com.github.spotbugs" % "spotbugs" % "3.1.1",
       "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findsecbugsPluginVersion),
     findSecBugs := (findSecBugsTask tag FindSecBugsTag).value
   )
@@ -35,9 +34,8 @@ object FindSecBugs extends AutoPlugin {
     def commandLineClasspath(classpathFiles: Seq[File]): String = PathFinder(classpathFiles.filter(_.exists)).absString
     lazy val log = Keys.streams.value.log
     lazy val output = crossTarget.value / "findsecbugs" / "report.html"
-    lazy val findbugsClasspath = Classpaths managedJars (FindsecbugsConfig, classpathTypes.value, update.value)
     lazy val classpath = commandLineClasspath((dependencyClasspath in Compile).value.files)
-    lazy val auxClasspath = commandLineClasspath((dependencyClasspath in Compile).value.files ++ (findbugsClasspath.files filter (_.getName startsWith "jsr305")))
+    lazy val auxClasspath = commandLineClasspath((dependencyClasspath in Compile).value.files)
     lazy val ivyHome = ivyPaths(_.ivyHome).value.getOrElse(Path.userHome / ".ivy2")
     lazy val pluginList = s"${ivyHome.absolutePath}/cache/com.h3xstream.findsecbugs/findsecbugs-plugin/jars/findsecbugs-plugin-$findsecbugsPluginVersion.jar"
     lazy val classDir = (classDirectory in Compile).value
