@@ -5,6 +5,8 @@ import java.io.File
 import sbt._
 import Keys._
 
+import Priority._
+
 object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
@@ -23,6 +25,7 @@ object FindSecBugs extends AutoPlugin {
     lazy val findSecBugsExcludeFile = settingKey[Option[File]]("The FindBugs exclude file for findsecbugs")
     lazy val findSecBugsFailOnMissingClass = settingKey[Boolean]("Consider 'missing class' flag as error")
     lazy val findSecBugsParallel = settingKey[Boolean]("Perform FindSecurityBugs check in parallel (or not)")
+    lazy val findSecBugsPriorityThreshold = settingKey[Priority]("Set the priority threshold. Bug instances must be at least as important as this priority to be reported")
     lazy val findSecBugs = taskKey[Unit]("Perform FindSecurityBugs check")
   }
 
@@ -38,6 +41,7 @@ object FindSecBugs extends AutoPlugin {
         findSecBugsExcludeFile := None,
         findSecBugsFailOnMissingClass := true,
         findSecBugsParallel := true,
+        findSecBugsPriorityThreshold := Low,
         concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
         ivyConfigurations += FindsecbugsConfig,
         libraryDependencies ++= Seq(
@@ -75,7 +79,7 @@ object FindSecBugs extends AutoPlugin {
         log.info(s"Performing FindSecurityBugs check of $filteredClassDirsStr...")
         val opts = List("-cp", classpath, "edu.umd.cs.findbugs.LaunchAppropriateUI", "-textui",
           "-exitcode", "-html:plain.xsl", "-output", output.getAbsolutePath, "-nested:true",
-          "-auxclasspath", auxClasspath, "-low", "-effort:max", "-pluginList", pluginList,
+          "-auxclasspath", auxClasspath, s"-${findSecBugsPriorityThreshold.value.name}", "-effort:max", "-pluginList", pluginList,
           "-noClassOk") ++
           List("-include", includeFile.getAbsolutePath) ++
           excludeFile.toList.flatMap(f => List("-exclude", f.getAbsolutePath)) ++
