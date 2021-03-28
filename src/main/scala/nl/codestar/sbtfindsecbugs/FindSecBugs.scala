@@ -11,8 +11,8 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
-  private val spotbugsVersion = "3.1.12"
-  private val findsecbugsPluginVersion = "1.9.0"
+  private val spotbugsVersion = "4.2.2"
+  private val findsecbugsPluginVersion = "1.11.0"
   private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findsecbugsPluginVersion
 
   private val FindsecbugsConfig = sbt.config("findsecbugs")
