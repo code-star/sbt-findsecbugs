@@ -5,7 +5,7 @@ organization := "nl.codestar"
 version := "0.17-SNAPSHOT"
 description := "The Findbugs security plugin wrapped in a sbt plugin"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.13"
 scalacOptions ++= Seq("-encoding", "UTF8", "-Xfatal-warnings",
   "-deprecation", "-feature", "-unchecked", "-Xlint",
   "-Ywarn-dead-code", "-Ywarn-adapted-args"
