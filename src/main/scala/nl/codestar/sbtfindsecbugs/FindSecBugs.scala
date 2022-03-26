@@ -10,7 +10,6 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
-  private val spotBugsVersion = "4.2.2"
   private val findSecBugsPluginVersion = "1.11.0"
   private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findSecBugsPluginVersion
 
@@ -25,6 +24,7 @@ object FindSecBugs extends AutoPlugin {
     lazy val findSecBugsFailOnMissingClass = settingKey[Boolean]("Consider 'missing class' flag as error")
     lazy val findSecBugsParallel = settingKey[Boolean]("Perform FindSecurityBugs check in parallel (or not)")
     lazy val findSecBugsPriorityThreshold = settingKey[Priority]("Set the priority threshold. Bug instances must be at least as important as this priority to be reported")
+    lazy val findSecBugsSpotBugsVersion = settingKey[String]("Version of the SpotBugs tool to use")
     lazy val findSecBugs = taskKey[Unit]("Perform FindSecurityBugs check")
   }
 
@@ -41,10 +41,11 @@ object FindSecBugs extends AutoPlugin {
         findSecBugsFailOnMissingClass := true,
         findSecBugsParallel := true,
         findSecBugsPriorityThreshold := Low,
+        findSecBugsSpotBugsVersion := "4.2.2",
         concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
         ivyConfigurations += FindSecBugsConfig,
         libraryDependencies ++= Seq(
-          "com.github.spotbugs" % "spotbugs" % spotBugsVersion % FindSecBugsConfig,
+          "com.github.spotbugs" % "spotbugs" % findSecBugsSpotBugsVersion.value % FindSecBugsConfig,
           pluginId % FindSecBugsConfig,
           "org.slf4j" % "slf4j-simple" % "1.8.0-beta4" % FindSecBugsConfig
         ),
