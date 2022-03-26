@@ -31,7 +31,7 @@ object FindSecBugs extends AutoPlugin {
 
   import autoImport._
 
-  override lazy val projectSettings =
+  override lazy val projectSettings: Seq[Def.Setting[_]] =
     inConfig(FindsecbugsConfig)(Defaults.configSettings) ++
       inTask(findSecBugs)(Seq(
         forkOptions := Defaults.forkOptionsTask.value,
