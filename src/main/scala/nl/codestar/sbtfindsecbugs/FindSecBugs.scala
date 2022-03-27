@@ -42,7 +42,7 @@ object FindSecBugs extends AutoPlugin {
         findSecBugsFailOnMissingClass := true,
         findSecBugsParallel := true,
         findSecBugsPriorityThreshold := Low,
-        findSecBugsSpotBugsVersion := "4.2.2",
+        findSecBugsSpotBugsVersion := "4.6.0",
         findSecBugsPluginVersion := "1.11.0",
         concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
         ivyConfigurations += FindSecBugsConfig,
