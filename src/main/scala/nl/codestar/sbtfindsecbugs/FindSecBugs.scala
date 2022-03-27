@@ -4,18 +4,16 @@ import java.io.File
 
 import sbt._
 import Keys._
-
 import Priority._
 
 object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
-  private val spotbugsVersion = "4.2.2"
-  private val findsecbugsPluginVersion = "1.11.0"
-  private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findsecbugsPluginVersion
+  private val findSecBugsPluginOrganization = "com.h3xstream.findsecbugs"
+  private val findSecBugsPluginName = "findsecbugs-plugin"
 
-  private val FindsecbugsConfig = sbt.config("findsecbugs")
+  private val FindSecBugsConfig = sbt.config("findsecbugs")
     .describedAs("Classpath configuration for SpotBugs")
   private val FindSecBugsTag = Tags.Tag("findSecBugs")
 
@@ -26,13 +24,15 @@ object FindSecBugs extends AutoPlugin {
     lazy val findSecBugsFailOnMissingClass = settingKey[Boolean]("Consider 'missing class' flag as error")
     lazy val findSecBugsParallel = settingKey[Boolean]("Perform FindSecurityBugs check in parallel (or not)")
     lazy val findSecBugsPriorityThreshold = settingKey[Priority]("Set the priority threshold. Bug instances must be at least as important as this priority to be reported")
+    lazy val findSecBugsSpotBugsVersion = settingKey[String]("Version of the SpotBugs tool to use")
+    lazy val findSecBugsPluginVersion = settingKey[String]("Version of the FindSecurityBugs plugin to use")
     lazy val findSecBugs = taskKey[Unit]("Perform FindSecurityBugs check")
   }
 
   import autoImport._
 
-  override lazy val projectSettings =
-    inConfig(FindsecbugsConfig)(Defaults.configSettings) ++
+  override lazy val projectSettings: Seq[Def.Setting[_]] =
+    inConfig(FindSecBugsConfig)(Defaults.configSettings) ++
       inTask(findSecBugs)(Seq(
         forkOptions := Defaults.forkOptionsTask.value,
         connectInput := true,
@@ -42,12 +42,14 @@ object FindSecBugs extends AutoPlugin {
         findSecBugsFailOnMissingClass := true,
         findSecBugsParallel := true,
         findSecBugsPriorityThreshold := Low,
+        findSecBugsSpotBugsVersion := "4.6.0",
+        findSecBugsPluginVersion := "1.11.0",
         concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
-        ivyConfigurations += FindsecbugsConfig,
+        ivyConfigurations += FindSecBugsConfig,
         libraryDependencies ++= Seq(
-          "com.github.spotbugs" % "spotbugs" % spotbugsVersion % FindsecbugsConfig,
-          pluginId % FindsecbugsConfig,
-          "org.slf4j" % "slf4j-simple" % "1.8.0-beta4" % FindsecbugsConfig
+          "com.github.spotbugs" % "spotbugs" % findSecBugsSpotBugsVersion.value % FindSecBugsConfig,
+          findSecBugsPluginOrganization % findSecBugsPluginName % findSecBugsPluginVersion.value % FindSecBugsConfig,
+          "org.slf4j" % "slf4j-simple" % "1.8.0-beta4" % FindSecBugsConfig
         ),
         findSecBugs := (findSecBugsTask tag FindSecBugsTag).value,
         artifactPath in findSecBugs := crossTarget.value / "findsecbugs" / "report.html"
@@ -57,14 +59,15 @@ object FindSecBugs extends AutoPlugin {
     def commandLineClasspath(classpathFiles: Seq[File]): String = PathFinder(classpathFiles.filter(_.exists)).absString
     lazy val log = Keys.streams.value.log
     lazy val output = (artifactPath in findSecBugs).value
-    lazy val classpath = commandLineClasspath((dependencyClasspath in FindsecbugsConfig).value.files)
+    lazy val classpath = commandLineClasspath((dependencyClasspath in FindSecBugsConfig).value.files)
     lazy val auxClasspath = commandLineClasspath((dependencyClasspath in Compile).value.files)
     lazy val classDirs = (products in Compile).value
     lazy val excludeFile = findSecBugsExcludeFile.value
 
     lazy val updateReport = update.value
     lazy val pluginList: String = findPluginJar(updateReport).getOrElse(
-      sys.error(s"Failed to find resolved JAR for $pluginId")
+      sys.error(
+        s"Failed to find resolved JAR for $findSecBugsPluginOrganization.$findSecBugsPluginName:${findSecBugsPluginVersion.value}")
     ).getAbsolutePath
     lazy val forkOptions0 = (findSecBugs / forkOptions).value
       // can't do this through settings - `streams` is a task.
@@ -93,8 +96,7 @@ object FindSecBugs extends AutoPlugin {
           case _ =>
             sys.error(s"Security issues found. Please review them in $output")
         }
-      }
-      else {
+      } else {
         val classDirsStr = classDirs.map(cd => s"'$cd'").mkString(", ")
         log.warn(s"Class directory list ($classDirsStr) contains no existing directories, not running scan")
       }
@@ -116,11 +118,11 @@ object FindSecBugs extends AutoPlugin {
   }
 
   private def findPluginJar(updateReport: UpdateReport): Option[File] =
-    updateReport.configuration(FindsecbugsConfig)
+    updateReport.configuration(FindSecBugsConfig)
       .flatMap(_.modules.find { resolvedModule =>
         // We don't compare the revisions, etc. - resolution can change those.
-        resolvedModule.module.organization == pluginId.organization &&
-        resolvedModule.module.name == pluginId.name
+        resolvedModule.module.organization == findSecBugsPluginOrganization &&
+        resolvedModule.module.name == findSecBugsPluginName
       })
       .flatMap(_.artifacts.collectFirst {
         case (artifact, file) if artifact.`type` == Artifact.DefaultType => file

@@ -7,20 +7,20 @@ object Priority {
   /**
     * Experimental priority for bug instances.
     */
-  val Experimental = Priority("experimental")
+  val Experimental: Priority = Priority("experimental")
 
   /**
     * Low priority for bug instances.
     */
-  val Low = Priority("low")
+  val Low: Priority = Priority("low")
 
   /**
     * Normal priority for bug instances.
     */
-  val Normal = Priority("medium")
+  val Normal: Priority = Priority("medium")
 
   /**
     * High priority for bug instances.
     */
-  val High = Priority("high")
+  val High: Priority = Priority("high")
 }
