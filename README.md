@@ -20,6 +20,14 @@ findSecBugsSpotBugsVersion := "4.6.0"
 
 ![spotbugs release badge]
 
+You can also override the default FindSecurityBugs plugin version as follows (note that newer versions may introduce breaking changes that would require first updating `sbt-findsecbugs`):
+
+```
+findSecBugsPluginVersion := "1.11.0"
+```
+
+![findsecbugs release badge]
+
 You can now run `sbt findSecBugs`.
 
 # Configuration
@@ -33,6 +41,7 @@ The plugin has the following settings:
 | `findSecBugsParallel`           | `true`                                              | In a multimodule build, whether to run the security check for all submodules in parallel. If you run into memory issues, it might help to set this to `false`.     |
 | `findSecBugsPriorityThreshold`  | `Priority.Low`                                      | Set the priority threshold. Bug instances must be at least as important as this priority to be reported. Possible values: `High`, `Normal`, `Low`, `Experimental`. |
 | `findSecBugsSpotBugsVersion`    | `4.2.2`                                             | Version of the SpotBugs tool to use.                                                                                                                               |
+| `findSecBugsPluginVersion`      | `1.11.0`                                            | Version of the FindSecurityBugs plugin to use.                                                                                                                     |
 | `findSecBugs / artifactPath`    | `crossTarget.value / "findsecbugs" / "report.html"` | Output path for the resulting report.                                                                                                                              |
 | `findSecBugs / forkOptions`     | derived from other settings                         | Configuration for the forked JVM. Uses the corresponding settings (`findSecBugs / javaOptions`).                                                                   |
 
@@ -48,3 +57,4 @@ To release a new version:
 * Run `sbt publish`
 
 [spotbugs release badge]: https://maven-badges.herokuapp.com/maven-central/com.github.spotbugs/spotbugs/badge.svg?subject=Latest%20spotbugs&color=yellowgreen
+[findsecbugs release badge]: https://maven-badges.herokuapp.com/maven-central/com.h3xstream.findsecbugs/findsecbugs-plugin/badge.svg?subject=Latest%20findsecbugs&color=yellowgreen

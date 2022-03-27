@@ -10,8 +10,8 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
-  private val findSecBugsPluginVersion = "1.11.0"
-  private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findSecBugsPluginVersion
+  private val findSecBugsPluginOrganization = "com.h3xstream.findsecbugs"
+  private val findSecBugsPluginName = "findsecbugs-plugin"
 
   private val FindSecBugsConfig = sbt.config("findsecbugs")
     .describedAs("Classpath configuration for SpotBugs")
@@ -25,6 +25,7 @@ object FindSecBugs extends AutoPlugin {
     lazy val findSecBugsParallel = settingKey[Boolean]("Perform FindSecurityBugs check in parallel (or not)")
     lazy val findSecBugsPriorityThreshold = settingKey[Priority]("Set the priority threshold. Bug instances must be at least as important as this priority to be reported")
     lazy val findSecBugsSpotBugsVersion = settingKey[String]("Version of the SpotBugs tool to use")
+    lazy val findSecBugsPluginVersion = settingKey[String]("Version of the FindSecurityBugs plugin to use")
     lazy val findSecBugs = taskKey[Unit]("Perform FindSecurityBugs check")
   }
 
@@ -42,11 +43,12 @@ object FindSecBugs extends AutoPlugin {
         findSecBugsParallel := true,
         findSecBugsPriorityThreshold := Low,
         findSecBugsSpotBugsVersion := "4.2.2",
+        findSecBugsPluginVersion := "1.11.0",
         concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
         ivyConfigurations += FindSecBugsConfig,
         libraryDependencies ++= Seq(
           "com.github.spotbugs" % "spotbugs" % findSecBugsSpotBugsVersion.value % FindSecBugsConfig,
-          pluginId % FindSecBugsConfig,
+          findSecBugsPluginOrganization % findSecBugsPluginName % findSecBugsPluginVersion.value % FindSecBugsConfig,
           "org.slf4j" % "slf4j-simple" % "1.8.0-beta4" % FindSecBugsConfig
         ),
         findSecBugs := (findSecBugsTask tag FindSecBugsTag).value,
@@ -64,7 +66,8 @@ object FindSecBugs extends AutoPlugin {
 
     lazy val updateReport = update.value
     lazy val pluginList: String = findPluginJar(updateReport).getOrElse(
-      sys.error(s"Failed to find resolved JAR for $pluginId")
+      sys.error(
+        s"Failed to find resolved JAR for $findSecBugsPluginOrganization.$findSecBugsPluginName:${findSecBugsPluginVersion.value}")
     ).getAbsolutePath
     lazy val forkOptions0 = (findSecBugs / forkOptions).value
       // can't do this through settings - `streams` is a task.
@@ -118,8 +121,8 @@ object FindSecBugs extends AutoPlugin {
     updateReport.configuration(FindSecBugsConfig)
       .flatMap(_.modules.find { resolvedModule =>
         // We don't compare the revisions, etc. - resolution can change those.
-        resolvedModule.module.organization == pluginId.organization &&
-        resolvedModule.module.name == pluginId.name
+        resolvedModule.module.organization == findSecBugsPluginOrganization &&
+        resolvedModule.module.name == findSecBugsPluginName
       })
       .flatMap(_.artifacts.collectFirst {
         case (artifact, file) if artifact.`type` == Artifact.DefaultType => file
