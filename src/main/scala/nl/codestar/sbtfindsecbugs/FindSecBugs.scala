@@ -11,8 +11,11 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
-  private val spotbugsVersion = "4.2.2"
-  private val findsecbugsPluginVersion = "1.11.0"
+  // Later versions introduce a failure: "java.lang.IllegalArgumentException: 1 is not a value stack offset"
+  // This will be fixed in 4.9.4 (not released yet): https://github.com/spotbugs/spotbugs/issues/3320
+  private val spotbugsVersion = "4.9.1"
+  private val findsecbugsPluginVersion = "1.14.0"
+  private val asmVersion = "9.5"
   private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findsecbugsPluginVersion
 
   private val FindsecbugsConfig = sbt.config("findsecbugs")
@@ -47,19 +50,25 @@ object FindSecBugs extends AutoPlugin {
         libraryDependencies ++= Seq(
           "com.github.spotbugs" % "spotbugs" % spotbugsVersion % FindsecbugsConfig,
           pluginId % FindsecbugsConfig,
-          "org.slf4j" % "slf4j-simple" % "1.8.0-beta4" % FindsecbugsConfig
+          "org.slf4j" % "slf4j-simple" % "2.0.17" % FindsecbugsConfig,
+          // Override transitive asm version for Java 21 compatibility
+          "org.ow2.asm" % "asm"          % asmVersion,
+          "org.ow2.asm" % "asm-analysis" % asmVersion,
+          "org.ow2.asm" % "asm-commons"  % asmVersion,
+          "org.ow2.asm" % "asm-tree"     % asmVersion,
+          "org.ow2.asm" % "asm-util"     % asmVersion
         ),
         findSecBugs := (findSecBugsTask tag FindSecBugsTag).value,
-        artifactPath in findSecBugs := crossTarget.value / "findsecbugs" / "report.html"
+        findSecBugs / artifactPath := crossTarget.value / "findsecbugs" / "report.html"
       )
 
   private def findSecBugsTask() = Def.task {
     def commandLineClasspath(classpathFiles: Seq[File]): String = PathFinder(classpathFiles.filter(_.exists)).absString
     lazy val log = Keys.streams.value.log
-    lazy val output = (artifactPath in findSecBugs).value
-    lazy val classpath = commandLineClasspath((dependencyClasspath in FindsecbugsConfig).value.files)
-    lazy val auxClasspath = commandLineClasspath((dependencyClasspath in Compile).value.files)
-    lazy val classDirs = (products in Compile).value
+    lazy val output = (findSecBugs / artifactPath).value
+    lazy val classpath = commandLineClasspath((FindsecbugsConfig / dependencyClasspath).value.files)
+    lazy val auxClasspath = commandLineClasspath((Compile / dependencyClasspath).value.files)
+    lazy val classDirs = (Compile / products).value
     lazy val excludeFile = findSecBugsExcludeFile.value
 
     lazy val updateReport = update.value
@@ -77,10 +86,19 @@ object FindSecBugs extends AutoPlugin {
       if (filteredClassDirs.nonEmpty) {
         val filteredClassDirsStr = filteredClassDirs.map(cd => s"'$cd'").mkString(", ")
         log.info(s"Performing FindSecurityBugs check of $filteredClassDirsStr...")
-        val opts = List("-cp", classpath, "edu.umd.cs.findbugs.LaunchAppropriateUI", "-textui",
-          "-exitcode", "-html:plain.xsl", "-output", output.getAbsolutePath, "-nested:true",
-          "-auxclasspath", auxClasspath, s"-${findSecBugsPriorityThreshold.value.name}", "-effort:max", "-pluginList", pluginList,
-          "-noClassOk") ++
+        val opts = List(
+          "-cp", classpath,
+          "edu.umd.cs.findbugs.LaunchAppropriateUI",
+          "-textui",
+          "-exitcode",
+          s"-html:plain.xsl=${output.getAbsolutePath}",
+          "-nested:true",
+          "-auxclasspath", auxClasspath,
+          s"-${findSecBugsPriorityThreshold.value.name}",
+          "-effort:max",
+          "-pluginList", pluginList,
+          "-noClassOk"
+        ) ++
           List("-include", includeFile.getAbsolutePath) ++
           excludeFile.toList.flatMap(f => List("-exclude", f.getAbsolutePath)) ++
           filteredClassDirs.map(_.getAbsolutePath)
