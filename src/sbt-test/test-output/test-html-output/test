@@ -1,2 +1,2 @@
 > findSecBugs
-$ exists target/scala-2.12/findsecbugs/report.html
+$ exists target/scala-2.13/findsecbugs/report.html
