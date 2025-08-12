@@ -27,3 +27,4 @@ project/plugins/project/
 
 # OS X
 .DS_Store
+.bsp

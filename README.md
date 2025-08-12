@@ -31,6 +31,6 @@ The plugin has automated test which can be run by this command `sbt scripted`
 
 ## Release
 To release a new version:
-* Get a [bintray](https://bintray.com) account and make sure you're a member of the [`code-star`](https://bintray.com/code-star) organization.
-* Run `sbt publish`
+
+TODO: figure this out, bintray is no longer available.
 
