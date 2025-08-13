@@ -1,6 +1,3 @@
-enablePlugins(SbtPlugin)
-
-name := "sbt-findsecbugs"
 
 ThisBuild / organization := "nl.codestar"
 ThisBuild / version := "0.18-SNAPSHOT"
