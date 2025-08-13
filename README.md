@@ -1,14 +1,21 @@
 [![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
 
 # sbt-findsecbugs
-An SBT plugin for FindSecurityBugs
+An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
 
 # Usage
-Add to your `plugins.sbt`: `"nl.codestar" % "sbt-findsecbugs" % "(current version)"`
+Add to your `plugins.sbt`, replacing `(current version)` with the latest version:
+
+```
+addSbtPlugin("nl.codestar" % "sbt-findsecbugs" % "(current version)")`
+```
 
 (You can find the current version [here](https://github.com/code-star/sbt-findsecbugs/releases).)
 
-You can now run `sbt findSecBugs`.
+You can now run: 
+```
+sbt findSecBugs
+```
 
 # Configuration
 
