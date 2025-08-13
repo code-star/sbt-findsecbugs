@@ -22,9 +22,6 @@ scriptedLaunchOpts := { scriptedLaunchOpts.value ++
 }
 scriptedBufferLog := false
 
-bintrayRepository := "sbt-findsecbugs"
-bintrayOrganization := Some("code-star")
-
 licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
 publishMavenStyle := false
