@@ -37,7 +37,13 @@ The plugin can be tested manually by running `sbt findSecBugs` in the test-proje
 The plugin has automated test which can be run by this command `sbt scripted`
 
 ## Release
-To release a new version:
+To release a new version, make sure you have:
+* proper access to the `nl.codestar` namespace on Sonatype.
+* GnuPG (`gpg`) installed and a signing key configured.
+  * We use `sbt-pgp` plugin to sign, which relies on the `gpg` command line tool
+* 
 
-TODO: figure this out, bintray is no longer available.
+See [Using Sonatype](https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html) in the SBT documentation.
 
+### Previous releases
+Up to version 0.16, the plugin was released via BinTray / JFrog. Old versions can be found at https://scala.jfrog.io/ui/native/sbt-plugin-releases/nl.codestar/sbt-findsecbugs/

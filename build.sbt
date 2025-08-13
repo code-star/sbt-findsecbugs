@@ -25,3 +25,11 @@ scriptedBufferLog := false
 licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
 publishMavenStyle := false
+
+publishTo := {
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
+}
+
+usePgpKeyHex("F379713EFB5A4C0CF021AB847A9F591F7E30B737")
