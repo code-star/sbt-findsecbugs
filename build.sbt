@@ -3,7 +3,7 @@ enablePlugins(SbtPlugin)
 name := "sbt-findsecbugs"
 organization := "nl.codestar"
 version := "0.18-SNAPSHOT"
-description := "The Findbugs security plugin wrapped in a sbt plugin"
+description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin"
 
 scalaVersion := "2.12.18"
 scalacOptions ++= Seq(
