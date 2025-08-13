@@ -41,9 +41,28 @@ To release a new version, make sure you have:
 * proper access to the `nl.codestar` namespace on Sonatype.
 * GnuPG (`gpg`) installed and a signing key configured.
   * We use `sbt-pgp` plugin to sign, which relies on the `gpg` command line tool
-* 
+* create a `.env` file in the project root with the following variables:
+  ```
+  PGP_KEYID=<id of the signing key>
+  PGP_PASSPHRASE=<your PGP passphrase>
+  SONATYPE_USER=<user id or token id>
+  SONATYPE_PASSWORD=<password or token>
+
+  ```
+
+Note: The `.env` file needs to be kept out of the git repository (it is `.gitignore`d).
 
 See [Using Sonatype](https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html) in the SBT documentation.
+
+Steps to release:
+1. Update the version in `build.sbt` to a non-SNAPSHOT version.
+2. `sbt publishLocalSigned`
+3. In the project root
+   * `./make-release.sh`
+4. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
+   * `https://central.sonatype.com/publishing`
+5. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
+
 
 ### Previous releases
 Up to version 0.16, the plugin was released via BinTray / JFrog. Old versions can be found at https://scala.jfrog.io/ui/native/sbt-plugin-releases/nl.codestar/sbt-findsecbugs/

@@ -51,8 +51,12 @@ ThisBuild / publishTo := {
   else localStaging.value
 }
 
-usePgpKeyHex("F379713EFB5A4C0CF021AB847A9F591F7E30B737")
-// usePgpKeyHex(System.getenv("PGP_KEYID"))
+ThisBuild / credentials += Credentials(
+  "GnuPG Key ID",
+  "gpg",
+  System.getenv("PGP_KEYID"), // key identifier
+  "ignored" // this field is ignored; passwords are supplied by pinentry
+)
 
 ThisBuild / credentials += Credentials(
   "Sonatype Nexus Repository Manager",
