@@ -1,6 +1,7 @@
 enablePlugins(SbtPlugin)
 
-ThisBuild / name := "sbt-findsecbugs"
+name := "sbt-findsecbugs"
+
 ThisBuild / organization := "nl.codestar"
 ThisBuild / version := "0.18-SNAPSHOT"
 ThisBuild / description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin"
@@ -78,3 +79,16 @@ ThisBuild / credentials += Credentials(
   System.getenv("SONATYPE_USER"),
   System.getenv("SONATYPE_PASSWORD") // Use environment variable for security
 )
+
+lazy val root = (project in file("."))
+  .enablePlugins(SbtPlugin, ScriptedPlugin)
+  .settings(
+    name := "sbt-findsecbugs",
+    version := "0.18-SNAPSHOT",
+    pluginCrossBuild / sbtVersion := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.11.2" // set minimum version
+      }
+    },
+    console / initialCommands := """import nl.codestar.sbt.findsecbugs._"""
+  )
