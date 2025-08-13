@@ -1,12 +1,30 @@
 enablePlugins(SbtPlugin)
 
-name := "sbt-findsecbugs"
-organization := "nl.codestar"
-version := "0.18-SNAPSHOT"
-description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin"
+ThisBuild / name := "sbt-findsecbugs"
+ThisBuild / organization := "nl.codestar"
+ThisBuild / version := "0.18-SNAPSHOT"
+ThisBuild / description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin"
 
-scalaVersion := "2.12.18"
-scalacOptions ++= Seq(
+ThisBuild / organizationName := "Codestar powered by Sopra Steria"
+ThisBuild / organizationHomepage := Some(url("https://codestar.nl"))
+ThisBuild / homepage := Some(url("https://codestar.nl/sbt-findsecbugs"))
+
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/code-star/sbt-findsecbugs"),"scm:git@github.com:code-star/sbt-findsecbugs.git")
+)
+
+ThisBuild / developers := List(
+  Developer(
+    "jeanmarc",
+    "Jean-Marc van Leerdam",
+    "jean-marc.vanleerdam@soprassteria.com",
+    url("https://soprasteria.com")
+  )
+)
+
+ThisBuild / scalaVersion := "2.12.18"
+ThisBuild / scalacOptions ++= Seq(
   "-encoding", "UTF8",
   "-Xfatal-warnings",
   "-deprecation",
@@ -17,19 +35,42 @@ scalacOptions ++= Seq(
   "-Ywarn-adapted-args"
 )
 
-scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+ThisBuild / scriptedLaunchOpts := { scriptedLaunchOpts.value ++
   Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
 }
-scriptedBufferLog := false
+ThisBuild / scriptedBufferLog := false
 
-licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
+ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
-publishMavenStyle := false
+ThisBuild / pomIncludeRepository := { _ => false }
+ThisBuild / publishMavenStyle := true
 
-publishTo := {
+ThisBuild / publishTo := {
   val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
 }
 
 usePgpKeyHex("F379713EFB5A4C0CF021AB847A9F591F7E30B737")
+// usePgpKeyHex(System.getenv("PGP_KEYID"))
+
+ThisBuild / credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
+  "oss.sonatype.org",
+  System.getenv("SONATYPE_USER"),
+  System.getenv("SONATYPE_PASSWORD") // Use environment variable for security
+)
+
+ThisBuild / credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
+  "central.sonatype.com",
+  System.getenv("SONATYPE_USER"),
+  System.getenv("SONATYPE_PASSWORD") // Use environment variable for security
+)
+
+ThisBuild / credentials += Credentials(
+  "central-snapshots",
+  "central.sonatype.com",
+  System.getenv("SONATYPE_USER"),
+  System.getenv("SONATYPE_PASSWORD") // Use environment variable for security
+)

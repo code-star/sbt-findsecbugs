@@ -18,6 +18,9 @@ project/plugins/project/
 .settings/
 **/.DS_Store
 
+# Do not commit secrets in the .env file
+.env
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
