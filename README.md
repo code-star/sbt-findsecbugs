@@ -54,7 +54,14 @@ Note: The `.env` file needs to be kept out of the git repository (it is `.gitign
 
 See [Using Sonatype](https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html) in the SBT documentation.
 
-Steps to release:
+Steps to release (preferred):
+1. Update the version in `build.sbt` to a non-SNAPSHOT version.
+2. `sbt publishSigned`
+3. `sbt sonaUpload`
+4. Go to https://central.sonatype.com/publishing/deployments and publish the deployment.
+   * or run `sbt sonaRelease` to publish the deployment automatically
+
+Steps to release via manual zip upload:
 1. Update the version in `build.sbt` to a non-SNAPSHOT version.
 2. `sbt publishLocalSigned`
 3. In the project root
