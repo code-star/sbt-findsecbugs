@@ -14,7 +14,7 @@ lazy val root = project.in(file("."))
     scalaVersion := "2.12.18",
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.11.2" // set minimum version
+        case "2.12" => "1.11.4" // set minimum version
       }
     },
     scalacOptions ++= Seq(

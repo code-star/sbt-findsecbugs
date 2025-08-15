@@ -1,5 +1,5 @@
 name := "test-project"
 version := "1.0"
 
-findSecBugsSpotBugsVersion := "4.6.0"
-findSecBugsPluginVersion := "1.11.0"
+findSecBugsSpotBugsVersion := "4.9.4"
+findSecBugsSpotBugsPluginVersion := "1.14.0"

@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     environment:
-      SBT_VERSION: 1.11.2
+      SBT_VERSION: 1.11.4
       SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
     docker:
       - image: cimg/openjdk:21.0
