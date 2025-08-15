@@ -1,7 +1,7 @@
 # test-showcase
 A multi-project sbt example that uses the `sbt-findsecbugs` plugin to run SpotBugs with FindSecurityBugs.
 
-There are 3 sub-projects in this showcase:
+There are 3 subprojects in this showcase:
 - `case_ignored_with_issues`: a subproject that has security issues, but is ignored by the plugin
 - `case_no_issues`: a subproject that has no security issues
 - `case_with_issues`: a subproject that has security issues and is not ignored
