@@ -75,7 +75,7 @@ Steps to release via manual zip upload:
 1. Update the version in `build.sbt` to a non-SNAPSHOT version.
 2. `sbt publishLocalSigned`
 3. In the project root
-   * `./make-release.sh`
+   * `./make_bundle.sh`
 4. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
    * `https://central.sonatype.com/publishing`
 5. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
