@@ -1,14 +1,21 @@
 [![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
 
 # sbt-findsecbugs
-An SBT plugin for FindSecurityBugs
+An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
 
 # Usage
-Add to your `plugins.sbt`: `"nl.codestar" % "sbt-findsecbugs" % "(current version)"`
+Add to your `plugins.sbt`, replacing `(current version)` with the latest version:
+
+```
+addSbtPlugin("nl.codestar" % "sbt-findsecbugs" % "(current version)")`
+```
 
 (You can find the current version [here](https://github.com/code-star/sbt-findsecbugs/releases).)
 
-You can now run `sbt findSecBugs`.
+You can now run: 
+```
+sbt findSecBugs
+```
 
 # Configuration
 
@@ -30,7 +37,39 @@ The plugin can be tested manually by running `sbt findSecBugs` in the test-proje
 The plugin has automated test which can be run by this command `sbt scripted`
 
 ## Release
-To release a new version:
-* Get a [bintray](https://bintray.com) account and make sure you're a member of the [`code-star`](https://bintray.com/code-star) organization.
-* Run `sbt publish`
+To release a new version, make sure you have:
+* proper access to the `nl.codestar` namespace on Sonatype.
+* GnuPG (`gpg`) installed and a signing key configured.
+  * We use `sbt-pgp` plugin to sign, which relies on the `gpg` command line tool
+* create a `.env` file in the project root with the following variables:
+  ```
+  PGP_KEYID=<id of the signing key>
+  PGP_PASSPHRASE=<your PGP passphrase>
+  SONATYPE_USER=<user id or token id>
+  SONATYPE_PASSWORD=<password or token>
 
+  ```
+
+Note: The `.env` file needs to be kept out of the git repository (it is `.gitignore`d).
+
+See [Using Sonatype](https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html) in the SBT documentation.
+
+Steps to release (preferred):
+1. Update the version in `build.sbt` to a non-SNAPSHOT version.
+2. `sbt publishSigned`
+3. `sbt sonaUpload`
+4. Go to https://central.sonatype.com/publishing/deployments and publish the deployment.
+   * or run `sbt sonaRelease` to publish the deployment automatically
+
+Steps to release via manual zip upload:
+1. Update the version in `build.sbt` to a non-SNAPSHOT version.
+2. `sbt publishLocalSigned`
+3. In the project root
+   * `./make-release.sh`
+4. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
+   * `https://central.sonatype.com/publishing`
+5. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
+
+
+### Previous releases
+Up to version 0.16, the plugin was released via BinTray / JFrog. Old versions can be found at https://scala.jfrog.io/ui/native/sbt-plugin-releases/nl.codestar/sbt-findsecbugs/

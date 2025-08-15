@@ -1,5 +1,5 @@
 // build root project
-lazy val root = Project("plugins", file(".")) dependsOn(ProjectRef(awesomeOS, "sbt-findsecbugs"))
+lazy val root = Project("test-project", file(".")) dependsOn(ProjectRef(localSecbugPlugin, "sbt-findsecbugs"))
 
-// depends on the awesomeOS project
-lazy val awesomeOS = file("..").getAbsoluteFile
+// depends on the localSecbugPlugin project (which is the parent project)
+lazy val localSecbugPlugin = file("..").getAbsoluteFile
