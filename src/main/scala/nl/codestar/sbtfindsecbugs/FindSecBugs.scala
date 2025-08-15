@@ -11,14 +11,17 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeOk: Int = 0
   private val exitCodeClassesMissing: Int = 2
 
+  private val asmVersion = "9.5"
   // Later versions introduce a failure: "java.lang.IllegalArgumentException: 1 is not a value stack offset"
   // This will be fixed in 4.9.4 (not released yet): https://github.com/spotbugs/spotbugs/issues/3320
+  private val spotbugsId = "com.github.spotbugs" % "spotbugs"
   private val spotbugsVersion = "4.9.1"
-  private val findsecbugsPluginVersion = "1.14.0"
-  private val asmVersion = "9.5"
-  private val pluginId = "com.h3xstream.findsecbugs" % "findsecbugs-plugin" % findsecbugsPluginVersion
+  private val findSecBugsPluginOrganization = "com.h3xstream.findsecbugs"
+  private val findSecBugsPluginName = "findsecbugs-plugin"
+  private val findSecBugsPluginId = findSecBugsPluginOrganization % findSecBugsPluginName
+  private val findSecBugsPluginVersion = "1.14.0"
 
-  private val FindsecbugsConfig = sbt.config("findsecbugs")
+  private val FindSecBugsConfig = sbt.config("findsecbugs")
     .describedAs("Classpath configuration for SpotBugs")
   private val FindSecBugsTag = Tags.Tag("findSecBugs")
 
@@ -29,51 +32,55 @@ object FindSecBugs extends AutoPlugin {
     lazy val findSecBugsFailOnMissingClass = settingKey[Boolean]("Consider 'missing class' flag as error")
     lazy val findSecBugsParallel = settingKey[Boolean]("Perform FindSecurityBugs check in parallel (or not)")
     lazy val findSecBugsPriorityThreshold = settingKey[Priority]("Set the priority threshold. Bug instances must be at least as important as this priority to be reported")
+    lazy val findSecBugsSpotBugsPluginVersion = settingKey[String]("Version of FindSecBugs plugin for SpotBugs to use")
+    lazy val findSecBugsSpotBugsVersion = settingKey[String]("Version of SpotBugs to use")
     lazy val findSecBugs = taskKey[Unit]("Perform FindSecurityBugs check")
   }
 
   import autoImport._
 
-  override lazy val projectSettings =
-    inConfig(FindsecbugsConfig)(Defaults.configSettings) ++
+  override lazy val projectSettings: Seq[Def.Setting[_]] =
+    inConfig(FindSecBugsConfig)(Defaults.configSettings) ++
       inTask(findSecBugs)(Seq(
         forkOptions := Defaults.forkOptionsTask.value,
         connectInput := true,
         javaOptions += "-Xmx1024m"
       )) ++ Seq(
-        findSecBugsExcludeFile := None,
-        findSecBugsFailOnMissingClass := true,
-        findSecBugsParallel := true,
-        findSecBugsPriorityThreshold := Low,
-        concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
-        ivyConfigurations += FindsecbugsConfig,
-        libraryDependencies ++= Seq(
-          "com.github.spotbugs" % "spotbugs" % spotbugsVersion % FindsecbugsConfig,
-          pluginId % FindsecbugsConfig,
-          "org.slf4j" % "slf4j-simple" % "2.0.17" % FindsecbugsConfig,
-          // Override transitive asm version for Java 21 compatibility
-          "org.ow2.asm" % "asm"          % asmVersion,
-          "org.ow2.asm" % "asm-analysis" % asmVersion,
-          "org.ow2.asm" % "asm-commons"  % asmVersion,
-          "org.ow2.asm" % "asm-tree"     % asmVersion,
-          "org.ow2.asm" % "asm-util"     % asmVersion
-        ),
-        findSecBugs := (findSecBugsTask tag FindSecBugsTag).value,
-        findSecBugs / artifactPath := crossTarget.value / "findsecbugs" / "report.html"
-      )
+      findSecBugsExcludeFile := None,
+      findSecBugsFailOnMissingClass := true,
+      findSecBugsParallel := true,
+      findSecBugsPriorityThreshold := Low,
+      findSecBugsSpotBugsPluginVersion := findSecBugsPluginVersion,
+      findSecBugsSpotBugsVersion := spotbugsVersion,
+      concurrentRestrictions in Global ++= (if (findSecBugsParallel.value) Nil else Seq(Tags.exclusive(FindSecBugsTag))),
+      ivyConfigurations += FindSecBugsConfig,
+      libraryDependencies ++= Seq(
+        spotbugsId % findSecBugsSpotBugsVersion.value % FindSecBugsConfig,
+        findSecBugsPluginId % findSecBugsSpotBugsPluginVersion.value % FindSecBugsConfig,
+        "org.slf4j" % "slf4j-simple" % "2.0.17" % FindSecBugsConfig,
+        // Override transitive asm version for Java 21 compatibility
+        "org.ow2.asm" % "asm" % asmVersion,
+        "org.ow2.asm" % "asm-analysis" % asmVersion,
+        "org.ow2.asm" % "asm-commons" % asmVersion,
+        "org.ow2.asm" % "asm-tree" % asmVersion,
+        "org.ow2.asm" % "asm-util" % asmVersion
+      ),
+      findSecBugs := (findSecBugsTask tag FindSecBugsTag).value,
+      findSecBugs / artifactPath := crossTarget.value / "findsecbugs" / "report.html"
+    )
 
   private def findSecBugsTask() = Def.task {
     def commandLineClasspath(classpathFiles: Seq[File]): String = PathFinder(classpathFiles.filter(_.exists)).absString
     lazy val log = Keys.streams.value.log
     lazy val output = (findSecBugs / artifactPath).value
-    lazy val classpath = commandLineClasspath((FindsecbugsConfig / dependencyClasspath).value.files)
+    lazy val classpath = commandLineClasspath((FindSecBugsConfig / dependencyClasspath).value.files)
     lazy val auxClasspath = commandLineClasspath((Compile / dependencyClasspath).value.files)
     lazy val classDirs = (Compile / products).value
     lazy val excludeFile = findSecBugsExcludeFile.value
 
     lazy val updateReport = update.value
     lazy val pluginList: String = findPluginJar(updateReport).getOrElse(
-      sys.error(s"Failed to find resolved JAR for $pluginId")
+      sys.error(s"Failed to find resolved JAR for $findSecBugsPluginId:${findSecBugsSpotBugsPluginVersion.value}")
     ).getAbsolutePath
     lazy val forkOptions0 = (findSecBugs / forkOptions).value
       // can't do this through settings - `streams` is a task.
@@ -111,8 +118,7 @@ object FindSecBugs extends AutoPlugin {
           case _ =>
             sys.error(s"Security issues found. Please review them in $output")
         }
-      }
-      else {
+      } else {
         val classDirsStr = classDirs.map(cd => s"'$cd'").mkString(", ")
         log.warn(s"Class directory list ($classDirsStr) contains no existing directories, not running scan")
       }
@@ -134,18 +140,18 @@ object FindSecBugs extends AutoPlugin {
   }
 
   private def findPluginJar(updateReport: UpdateReport): Option[File] =
-    updateReport.configuration(FindsecbugsConfig)
+    updateReport.configuration(FindSecBugsConfig)
       .flatMap(_.modules.find { resolvedModule =>
         // We don't compare the revisions, etc. - resolution can change those.
-        resolvedModule.module.organization == pluginId.organization &&
-        resolvedModule.module.name == pluginId.name
+        resolvedModule.module.organization == findSecBugsPluginOrganization &&
+        resolvedModule.module.name == findSecBugsPluginName
       })
       .flatMap(_.artifacts.collectFirst {
         case (artifact, file) if artifact.`type` == Artifact.DefaultType => file
       })
 
   /**
-    * FindBugs logs everyting to stderr, even when everything was succesful.
+    * FindBugs logs everything to stderr, even when everything was successful.
     * This logger makes that logging a little bit smarter.
     */
   class FindBugsLogger(underlying: Logger) extends Logger {
