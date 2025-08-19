@@ -4,7 +4,7 @@
 An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
 
 # Usage
-Add to your `plugins.sbt`, replacing `(current version)` with the latest version:
+Add the following line to your `project/plugins.sbt`, replacing `(current version)` with the latest version:
 
 ```
 addSbtPlugin("nl.codestar" % "sbt-findsecbugs" % "(current version)")`
@@ -22,6 +22,16 @@ findSecBugsSpotBugsPluginVersion := "1.14.0"
 You can now run: 
 ```
 sbt findSecBugs
+```
+
+## Ignoring sub-projects
+The plugin is an autoplugin, which means it is activated for all projects by default.
+
+If you want to ignore a sub-project, you can add the following setting to that sub-project:
+
+```sbt
+lazy val subProject = project.in(file("sub-folder"))
+  .disablePlugins(FindSecBugs)
 ```
 
 # Configuration
@@ -42,7 +52,7 @@ sbt-findsecbugs has several settings:
 # For developers of sbt-findsecbugs
 
 ## Tests
-The plugin can be tested manually by running `sbt findSecBugs` in the `test-project` folder.
+The plugin can be tested manually by running `sbt findSecBugs` in the `test-project` folder (this uses the local version of the plugin).
 
 The plugin has automated tests which can be run by this command `sbt scripted`
 
