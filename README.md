@@ -1,4 +1,6 @@
-[![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
+[![sbt-findsecbugs release badge](https://maven-badges.sml.io/sonatype-central/nl.codestar/sbt-findsecbugs_2.12_1.0/badge.svg?subject=Latest%20sbt-findsecbugs)](https://github.com/code-star/sbt-findsecbugs)
+
+CircleCI [![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
 
 # sbt-findsecbugs
 An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
@@ -18,6 +20,10 @@ Optionally, override the default SpotBugs and FindSecBugs versions in your `buil
 findSecBugsSpotBugsVersion := "4.9.4"
 findSecBugsSpotBugsPluginVersion := "1.14.0"
 ```
+
+[![spotbugs release badge](https://maven-badges.sml.io/maven-central/com.github.spotbugs/spotbugs/badge.svg?subject=Latest%20spotbugs&color=yellowgreen)](https://maven-badges.sml.io/maven-central/com.github.spotbugs/spotbugs)
+
+[![findsecbugs release badge](https://maven-badges.sml.io/maven-central/com.h3xstream.findsecbugs/findsecbugs-plugin/badge.svg?subject=Latest%20findsecbugs&color=yellowgreen)](https://maven-badges.sml.io/maven-central/com.h3xstream.findsecbugs/findsecbugs-plugin)
 
 You can now run: 
 ```
