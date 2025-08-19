@@ -12,10 +12,8 @@ object FindSecBugs extends AutoPlugin {
   private val exitCodeClassesMissing: Int = 2
 
   private val asmVersion = "9.5"
-  // Later versions introduce a failure: "java.lang.IllegalArgumentException: 1 is not a value stack offset"
-  // This will be fixed in 4.9.4 (not released yet): https://github.com/spotbugs/spotbugs/issues/3320
   private val spotbugsId = "com.github.spotbugs" % "spotbugs"
-  private val spotbugsVersion = "4.9.1"
+  private val spotbugsVersion = "4.9.4"
   private val findSecBugsPluginOrganization = "com.h3xstream.findsecbugs"
   private val findSecBugsPluginName = "findsecbugs-plugin"
   private val findSecBugsPluginId = findSecBugsPluginOrganization % findSecBugsPluginName
