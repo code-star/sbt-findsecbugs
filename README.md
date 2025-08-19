@@ -1,6 +1,5 @@
 [![sbt-findsecbugs release badge](https://maven-badges.sml.io/sonatype-central/nl.codestar/sbt-findsecbugs_2.12_1.0/badge.svg?subject=Latest%20sbt-findsecbugs)](https://github.com/code-star/sbt-findsecbugs)
-
-CircleCI [![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
+[![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png?style=shield)](https://circleci.com/gh/code-star/sbt-findsecbugs)
 
 # sbt-findsecbugs
 An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
