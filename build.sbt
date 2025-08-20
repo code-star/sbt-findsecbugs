@@ -15,8 +15,8 @@ lazy val root = project.in(file("."))
       val o = organization.value
       val n = name.value
       val v = version.value
-      val uuid = UUID.randomUUID().toString.take(8)
-      s"$o:$n:$v:$uuid"
+      val dt = java.time.LocalDateTime.now.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+      s"$o:$n:$v:$dt"
     },
 
     scalaVersion := "2.12.18",
