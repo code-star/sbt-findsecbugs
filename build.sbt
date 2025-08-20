@@ -93,4 +93,4 @@ ThisBuild / publishTo := {
 }
 
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / version := VersionHelper.myVersion(dynverGitDescribeOutput.value, true)
+ThisBuild / version := VersionHelper.myVersion(dynverGitDescribeOutput.value)
