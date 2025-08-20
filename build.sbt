@@ -4,7 +4,7 @@ lazy val root = project.in(file("."))
   .enablePlugins(SbtPlugin, ScriptedPlugin)
   .settings(
     name := "sbt-findsecbugs",
-    version := "0.19-SNAPSHOT",
+    version := "0.19",
     description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin",
     organization := "nl.codestar",
     organizationName := "Codestar powered by Sopra Steria",
