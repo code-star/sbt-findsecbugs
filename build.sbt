@@ -1,4 +1,3 @@
-
 lazy val root = project.in(file("."))
   .withId("sbt-findsecbugs")
   .enablePlugins(SbtPlugin, ScriptedPlugin)
