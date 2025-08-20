@@ -82,6 +82,7 @@ ThisBuild / scriptedBufferLog := false
 
 ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
+
 ThisBuild / pomIncludeRepository := { _ => false }
 ThisBuild / publishMavenStyle := true
 
