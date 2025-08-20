@@ -1,4 +1,3 @@
-import java.util.UUID
 
 lazy val root = project.in(file("."))
   .withId("sbt-findsecbugs")
@@ -91,3 +90,6 @@ ThisBuild / publishTo := {
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
 }
+
+ThisBuild / dynverSonatypeSnapshots := true
+ThisBuild / version := VersionHelper.myVersion(dynverGitDescribeOutput.value, true)
