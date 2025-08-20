@@ -1,3 +1,4 @@
+import java.util.UUID
 
 lazy val root = project.in(file("."))
   .withId("sbt-findsecbugs")
@@ -84,3 +85,11 @@ ThisBuild / publishTo := {
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
 }
+
+ThisBuild / sonaDeploymentName := {
+    val o = organization.value
+    val n = name.value
+    val v = version.value
+    val uuid = UUID.randomUUID().toString.take(8)
+    s"$o:$n:$v:$uuid"
+  }
