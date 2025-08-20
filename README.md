@@ -1,4 +1,5 @@
-[![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png)](https://circleci.com/gh/code-star/sbt-findsecbugs)
+[![sbt-findsecbugs release badge](https://maven-badges.sml.io/sonatype-central/nl.codestar/sbt-findsecbugs_2.12_1.0/badge.svg?subject=Latest%20sbt-findsecbugs)](https://github.com/code-star/sbt-findsecbugs)
+[![CircleCI](https://circleci.com/gh/code-star/sbt-findsecbugs.png?style=shield)](https://circleci.com/gh/code-star/sbt-findsecbugs)
 
 # sbt-findsecbugs
 An SBT plugin to run [SpotBugs](https://spotbugs.github.io/) with [FindSecurityBugs](https://find-sec-bugs.github.io/) plugin in your SBT build.
@@ -11,6 +12,17 @@ addSbtPlugin("nl.codestar" % "sbt-findsecbugs" % "(current version)")`
 ```
 
 (You can find the current version [here](https://github.com/code-star/sbt-findsecbugs/releases).)
+
+Optionally, override the default SpotBugs and FindSecBugs versions in your `build.sbt`:
+
+```
+findSecBugsSpotBugsVersion := "4.9.4"
+findSecBugsSpotBugsPluginVersion := "1.14.0"
+```
+
+[![spotbugs release badge](https://maven-badges.sml.io/maven-central/com.github.spotbugs/spotbugs/badge.svg?subject=Latest%20spotbugs&color=yellowgreen)](https://maven-badges.sml.io/maven-central/com.github.spotbugs/spotbugs)
+
+[![findsecbugs release badge](https://maven-badges.sml.io/maven-central/com.h3xstream.findsecbugs/findsecbugs-plugin/badge.svg?subject=Latest%20findsecbugs&color=yellowgreen)](https://maven-badges.sml.io/maven-central/com.h3xstream.findsecbugs/findsecbugs-plugin)
 
 You can now run: 
 ```
@@ -29,22 +41,25 @@ lazy val subProject = project.in(file("sub-folder"))
 
 # Configuration
 
-sbt-findsecbugs has one setting:
+sbt-findsecbugs has several settings:
 
-| Setting                         | Default                                             | Meaning                                                                                                                                                            |
-|---------------------------------|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `findSecBugsExcludeFile`        | `None`                                              | Optionally provide a SpotBugs [exclusion file](https://spotbugs.readthedocs.io/en/latest/filter.html).                                                             |
-| `findSecBugsFailOnMissingClass` | `true`                                              | Consider the 'missing class' flag as failure or not. Set this to 'false' in case you excpect and want to ignore missing class messages during the check.           |
-| `findSecBugsParallel`           | `true`                                              | In a multimodule build, whether to run the security check for all submodules in parallel. If you run into memory issues, it might help to set this to `false`.     |
-| `findSecBugsPriorityThreshold`  | `Priority.Low`                                      | Set the priority threshold. Bug instances must be at least as important as this priority to be reported. Possible values: `High`, `Normal`, `Low`, `Experimental`. |
-| `findSecBugs / artifactPath`    | `crossTarget.value / "findsecbugs" / "report.html"` | Output path for the resulting report.                                                                                                                              |
-| `findSecBugs / forkOptions`     | derived from other settings                         | Configuration for the forked JVM. Uses the corresponding settings (`findSecBugs / javaOptions`).                                                                   |
+| Setting                            | Default                                             | Meaning                                                                                                                                                           |
+|------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `findSecBugsExcludeFile`           | `None`                                              | Optionally provide a SpotBugs [exclusion file](https://spotbugs.readthedocs.io/en/latest/filter.html)                                                             |
+| `findSecBugsFailOnMissingClass`    | `true`                                              | Consider a `missing class` message as failure or not. Set this to `false` in case you expect them, and want to ignore them during the check                       |
+| `findSecBugsParallel`              | `true`                                              | In a multimodule build, whether to run the security check for all submodules in parallel. If you run into memory issues, it might help to set this to `false`     |
+| `findSecBugsPriorityThreshold`     | `Priority.Low`                                      | Set the priority threshold. Bug instances must be at least as important as this priority to be reported. Possible values: `High`, `Normal`, `Low`, `Experimental` |
+| `findSecBugsSpotBugsVersion`       | 4.9.4                                               | The version of SpotBugs to use                                                                                                                                    |  
+| `findSecBugsSpotBugsPluginVersion` | 1.14.0                                              | The version of FindSecBugs SpotBugs plugin to use                                                                                                                 |
+| `findSecBugs / artifactPath`       | `crossTarget.value / "findsecbugs" / "report.html"` | Output path for the resulting report                                                                                                                              |
+| `findSecBugs / forkOptions`        | derived from other settings                         | Configuration for the forked JVM. Uses the corresponding settings (`findSecBugs / javaOptions`)                                                                   |
 
 # For developers of sbt-findsecbugs
 
 ## Tests
-The plugin can be tested manually by running `sbt findSecBugs` in the test-project (this uses the local version of the plugin)
-The plugin has automated test which can be run by this command `sbt scripted`
+The plugin can be tested manually by running `sbt findSecBugs` in the `test-project` folder (this uses the local version of the plugin).
+
+The plugin has automated tests which can be run by this command `sbt scripted`
 
 ## Release
 To release a new version, make sure you have:
@@ -75,7 +90,7 @@ Steps to release via manual zip upload:
 1. Update the version in `build.sbt` to a non-SNAPSHOT version.
 2. `sbt publishLocalSigned`
 3. In the project root
-   * `./make-release.sh`
+   * `./make_bundle.sh`
 4. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
    * `https://central.sonatype.com/publishing`
 5. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
