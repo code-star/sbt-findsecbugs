@@ -5,12 +5,19 @@ lazy val root = project.in(file("."))
   .enablePlugins(SbtPlugin, ScriptedPlugin)
   .settings(
     name := "sbt-findsecbugs",
-    version := "0.19",
+    version := "0.20",
     description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin",
     organization := "nl.codestar",
     organizationName := "Codestar powered by Sopra Steria",
     organizationHomepage := Some(url("https://codestar.nl")),
     homepage := Some(url("https://codestar.nl/sbt-findsecbugs")),
+    sonaDeploymentName := {
+      val o = organization.value
+      val n = name.value
+      val v = version.value
+      val uuid = UUID.randomUUID().toString.take(8)
+      s"$o:$n:$v:$uuid"
+    },
 
     scalaVersion := "2.12.18",
     pluginCrossBuild / sbtVersion := {
@@ -85,11 +92,3 @@ ThisBuild / publishTo := {
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
 }
-
-ThisBuild / sonaDeploymentName := {
-    val o = organization.value
-    val n = name.value
-    val v = version.value
-    val uuid = UUID.randomUUID().toString.take(8)
-    s"$o:$n:$v:$uuid"
-  }
