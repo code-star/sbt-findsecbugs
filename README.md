@@ -80,20 +80,34 @@ Note: The `.env` file needs to be kept out of the git repository (it is `.gitign
 See [Using Sonatype](https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html) in the SBT documentation.
 
 Steps to release (preferred):
-1. Update the version in `build.sbt` to a non-SNAPSHOT version.
-2. `sbt publishSigned`
-3. `sbt sonaUpload`
-4. Go to https://central.sonatype.com/publishing/deployments and publish the deployment.
+1. Make sure the working copy is clean and up to date (no pending commits)
+2. Tag the current commit with the next version number, e.g. `git tag v0.21`
+   * NOTE: prefix the tag with `v` to indicate it is a version tag (this is a change since release 0.20, because we're using sbt-dynver now)
+3. `sbt publishSigned`
+4. `sbt sonaUpload`
+5. Go to https://central.sonatype.com/publishing/deployments and publish the deployment.
    * or run `sbt sonaRelease` to publish the deployment automatically
 
 Steps to release via manual zip upload:
-1. Update the version in `build.sbt` to a non-SNAPSHOT version.
-2. `sbt publishLocalSigned`
-3. In the project root
+1. Make sure the working copy is clean and up to date (no pending commits)
+2. Tag the current commit with the next version number, e.g. `git tag v0.21`
+    * NOTE: prefix the tag with `v` to indicate it is a version tag (this is a change since release 0.20, because we're using sbt-dynver now)
+3. `sbt publishLocalSigned`
+4. In the project root
    * `./make_bundle.sh`
-4. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
+5. Upload the `./target/result.zip` as a new deployment to the Sonatype `nl.codestar` namespace
    * `https://central.sonatype.com/publishing`
-5. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
+6. If the zip is validated, you can publish by clicking the `Publish` button, or `drop` to abandon the deployment
+
+### Update Github
+After a release, also create a release on Github:
+
+1. Push the tag to the remote repository: `git push origin v0.21`
+2. Go to the [Releases page](https://github.com/code-star/sbt-findsecbugs/releases)
+3. Click on `Draft a new release`
+4. Select the tag you just pushed, and fill in the release notes
+5. Drag the `bundle.zip` from the `target/sona-bundle` folder into the release
+6. Click on `Publish release`
 
 
 ### Previous releases
