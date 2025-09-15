@@ -1,15 +1,20 @@
-
 lazy val root = project.in(file("."))
   .withId("sbt-findsecbugs")
   .enablePlugins(SbtPlugin, ScriptedPlugin)
   .settings(
     name := "sbt-findsecbugs",
-    version := "0.19-SNAPSHOT",
     description := "The Spotbugs tool, with Findbugs security plugin, wrapped in an sbt plugin",
     organization := "nl.codestar",
     organizationName := "Codestar powered by Sopra Steria",
     organizationHomepage := Some(url("https://codestar.nl")),
     homepage := Some(url("https://codestar.nl/sbt-findsecbugs")),
+    sonaDeploymentName := {
+      val o = organization.value
+      val n = name.value
+      val v = version.value
+      val dt = java.time.LocalDateTime.now.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+      s"$o:$n:$v:$dt"
+    },
 
     scalaVersion := "2.12.18",
     pluginCrossBuild / sbtVersion := {
@@ -76,6 +81,7 @@ ThisBuild / scriptedBufferLog := false
 
 ThisBuild / licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 
+
 ThisBuild / pomIncludeRepository := { _ => false }
 ThisBuild / publishMavenStyle := true
 
@@ -84,3 +90,6 @@ ThisBuild / publishTo := {
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
 }
+
+ThisBuild / dynverSonatypeSnapshots := true
+ThisBuild / version := VersionHelper.myVersion(dynverGitDescribeOutput.value)
