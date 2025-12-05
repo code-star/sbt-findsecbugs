@@ -1,0 +1,22 @@
+name: gh-actions
+run-name: ${{ github.actor }} triggered a Github Action
+on: [push]
+jobs:
+  sanity-checks:
+    env:
+      MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
+      MC_TOKEN_PASS: ${{ secrets.MAVEN_CENTRAL_TOKEN_PASSWORD }}
+      SBT_VERSION: 1.11.4
+      SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Our environment
+        run: env | sort
+      - name: Organisation secrets
+        run: |
+          echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
+          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASSWORD:0:1} and is ${#MC_TOKEN_PASSWORD} long"
+      - name: Perform the tests
+        run: sbt clean test:compile scripted
