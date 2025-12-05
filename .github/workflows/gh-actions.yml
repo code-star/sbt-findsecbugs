@@ -12,11 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
       - name: Our environment
         run: env | sort
       - name: Organisation secrets
         run: |
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
-          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASSWORD:0:1} and is ${#MC_TOKEN_PASSWORD} long"
+          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASS:0:1} and is ${#MC_TOKEN_PASS} long"
       - name: Perform the tests
         run: sbt clean test:compile scripted
