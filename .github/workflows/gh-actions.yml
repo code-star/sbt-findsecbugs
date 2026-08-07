@@ -66,9 +66,10 @@ jobs:
       - *setup-java-action
       - *setup-sbt-action
       - *cache-action
-      - name: Organisation secrets
+      - name: Verify tag is based on main
         run: |
-          echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
-          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASS:0:1} and is ${#MC_TOKEN_PASS} long"
-      - name: Publish to Maven Central
-        run: sbt clean test:compile scripted
+          git fetch origin main
+          git merge-base --is-ancestor ${{ github.sha }} origin/main \
+          || { echo "Tag is not on a commit reachable from main"; exit 1; }
+      - name: Publish and upload to Maven Central
+        run: sbt clean publishSigned sonaUpload
