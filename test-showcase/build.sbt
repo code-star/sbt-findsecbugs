@@ -5,7 +5,7 @@ lazy val root = project.in(file("."))
     version := "0.0.1-SNAPSHOT",
     description := "A showcase multi-project for sbt-findsecbugs",
 
-    scalaVersion := "2.12.18"
+    scalaVersion := "2.12.21"
   ).aggregate(
     caseIgnoredWithIssues,
     caseNoIssues,

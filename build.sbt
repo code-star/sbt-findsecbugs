@@ -16,10 +16,10 @@ lazy val root = project.in(file("."))
       s"$o:$n:$v:$dt"
     },
 
-    scalaVersion := "2.12.18",
+    scalaVersion := "2.12.21",
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.11.4" // set minimum version
+        case "2.12" => "1.12.15" // set minimum version
       }
     },
     scalacOptions ++= Seq(

@@ -1,12 +1,18 @@
 name: gh-actions
 run-name: ${{ github.actor }} triggered a Github Action
-on: [push]
+on:
+  push:
+      branches:
+        - "**"  # Regular commits to any branch
+      tags:
+        - "v*"  # Version tags starting with 'v'
 jobs:
   sanity-checks:
+    if: github.ref_type == 'branch'
     env:
       MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
       MC_TOKEN_PASS: ${{ secrets.MAVEN_CENTRAL_TOKEN_PASSWORD }}
-      SBT_VERSION: 1.11.4
+      SBT_VERSION: 1.12.15
       SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
 
     runs-on: ubuntu-latest
@@ -31,4 +37,35 @@ jobs:
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
           echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASS:0:1} and is ${#MC_TOKEN_PASS} long"
       - name: Perform the tests
+        run: sbt clean test:compile scripted
+
+  release-on-tag:
+    if: github.ref_type == 'tag'
+    env:
+      MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
+      MC_TOKEN_PASS: ${{ secrets.MAVEN_CENTRAL_TOKEN_PASSWORD }}
+      SBT_VERSION: 1.12.15
+      SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+      - name: Cache SBT
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+      - name: Organisation secrets
+        run: |
+          echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
+          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASS:0:1} and is ${#MC_TOKEN_PASS} long"
+      - name: Publish to Maven Central
         run: sbt clean test:compile scripted
