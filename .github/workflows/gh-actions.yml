@@ -1,0 +1,77 @@
+name: gh-actions
+run-name: ${{ github.actor }} triggered a Github Action
+on:
+  push:
+    branches:
+      - "**" # Regular commits to any branch
+    tags:
+      - "v*" # Version tags starting with 'v'
+
+jobs:
+  action-versions: # never runs — anchor definitions only
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - &checkout-action
+        uses: actions/checkout@v7
+      - &setup-java-action
+        uses: actions/setup-java@v5
+        name: Setup JDK
+        with:
+          distribution: temurin
+          java-version: '17'
+      - &setup-sbt-action
+        uses: sbt/setup-sbt@v1
+        name: Setup sbt launcher
+      - &cache-action
+        uses: actions/cache@v6
+        name: Cache SBT
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
+  quality-assurance:
+    if: github.ref_type == 'branch'
+    env:
+      MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
+      MC_TOKEN_PASS: ${{ secrets.MAVEN_CENTRAL_TOKEN_PASSWORD }}
+      SBT_VERSION: 1.12.15
+      SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
+
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout-action
+      - *setup-java-action
+      - *setup-sbt-action
+      - *cache-action
+      - name: Organisation secrets
+        run: |
+          echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
+          echo "MAVEN_CENTRAL_TOKEN_PASSWORD starts with ${MC_TOKEN_PASS:0:1} and is ${#MC_TOKEN_PASS} long"
+      - name: Perform the tests
+        run: sbt clean test:compile scripted
+
+  release-on-tag:
+    if: github.ref_type == 'tag'
+    env:
+      MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
+      MC_TOKEN_PASS: ${{ secrets.MAVEN_CENTRAL_TOKEN_PASSWORD }}
+      SBT_VERSION: 1.12.15
+      SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Fetch all history for all tags and branches
+      - *setup-java-action
+      - *setup-sbt-action
+      - *cache-action
+      - name: Verify tag is based on main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor ${{ github.sha }} origin/main \
+          || { echo "Tag is not on a commit reachable from main"; exit 1; }
+      - name: Publish and upload to Maven Central
+        run: sbt clean publishSigned sonaUpload
