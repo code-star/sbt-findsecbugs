@@ -2,10 +2,17 @@ name: gh-actions
 run-name: ${{ github.actor }} triggered a Github Action
 on:
   push:
-      branches:
-        - "**"  # Regular commits to any branch
-      tags:
-        - "v*"  # Version tags starting with 'v'
+    branches:
+      - "**" # Regular commits to any branch
+    tags:
+      - "v*" # Version tags starting with 'v'
+
+.action-versions:
+  cache: &cache-action actions/cache@v6
+  checkout: &checkout-action actions/checkout@v7
+  setup-java: &setup-java-action actions/setup-java@v5
+  setup-sbt: &setup-sbt-action sbt/setup-sbt@v1
+
 jobs:
   sanity-checks:
     if: github.ref_type == 'branch'
@@ -17,16 +24,16 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: *checkout-action
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: *setup-java-action
         with:
           distribution: temurin
           java-version: 11
       - name: Setup sbt launcher
-        uses: sbt/setup-sbt@v1
+        uses: *setup-sbt-action
       - name: Cache SBT
-        uses: actions/cache@v4
+        uses: *cache-action
         with:
           path: |
             ~/.ivy2/cache
@@ -48,16 +55,16 @@ jobs:
       SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: *checkout-action
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: *setup-java-action
         with:
           distribution: temurin
-          java-version: 11
+          java-version: 17
       - name: Setup sbt launcher
-        uses: sbt/setup-sbt@v1
+        uses: *setup-sbt-action
       - name: Cache SBT
-        uses: actions/cache@v4
+        uses: *cache-action
         with:
           path: |
             ~/.ivy2/cache
