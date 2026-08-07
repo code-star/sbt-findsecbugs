@@ -8,6 +8,26 @@ on:
       - "v*" # Version tags starting with 'v'
 
 jobs:
+  action-versions: # never runs — anchor definitions only
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: &checkout-action   actions/checkout@v7
+      - uses: &setup-java-action actions/setup-java@v5
+        name: Setup JDK
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: &setup-sbt-action  sbt/setup-sbt@v1
+        name: Setup sbt launcher
+      - uses: &cache-action      actions/cache@v6
+        name: Cache SBT
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+
   sanity-checks:
     if: github.ref_type == 'branch'
     env:
@@ -18,21 +38,10 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: &checkout-action actions/checkout@v7
-      - name: Setup JDK
-        uses: &setup-java-action actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 11
-      - name: Setup sbt launcher
-        uses: &setup-sbt-action sbt/setup-sbt@v1
-      - name: Cache SBT
-        uses: &cache-action actions/cache@v6
-        with:
-          path: |
-            ~/.ivy2/cache
-            ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+      - uses: *checkout-action
+      - uses: *setup-java-action
+      - uses: *setup-sbt-action
+      - uses: *cache-action
       - name: Organisation secrets
         run: |
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
@@ -50,20 +59,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: *checkout-action
-      - name: Setup JDK
-        uses: *setup-java-action
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Setup sbt launcher
-        uses: *setup-sbt-action
-      - name: Cache SBT
-        uses: *cache-action
-        with:
-          path: |
-            ~/.ivy2/cache
-            ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+      - uses: *setup-java-action
+      - uses: *setup-sbt-action
+      - uses: *cache-action
       - name: Organisation secrets
         run: |
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
