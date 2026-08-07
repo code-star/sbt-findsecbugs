@@ -32,7 +32,7 @@ jobs:
             ~/.sbt
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
 
-  sanity-checks:
+  quality-assurance:
     if: github.ref_type == 'branch'
     env:
       MC_TOKEN_USER: ${{ secrets.MAVEN_CENTRAL_TOKEN_USER }}
