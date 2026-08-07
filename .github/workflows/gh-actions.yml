@@ -12,15 +12,19 @@ jobs:
     if: false
     runs-on: ubuntu-latest
     steps:
-      - uses: &checkout-action   actions/checkout@v7
-      - uses: &setup-java-action actions/setup-java@v5
+      - &checkout-action
+        uses: actions/checkout@v7
+      - &setup-java-action
+        uses: actions/setup-java@v5
         name: Setup JDK
         with:
           distribution: temurin
           java-version: '17'
-      - uses: &setup-sbt-action  sbt/setup-sbt@v1
+      - &setup-sbt-action
+        uses: sbt/setup-sbt@v1
         name: Setup sbt launcher
-      - uses: &cache-action      actions/cache@v6
+      - &cache-action
+        uses: actions/cache@v6
         name: Cache SBT
         with:
           path: |
@@ -38,10 +42,10 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: *checkout-action
-      - uses: *setup-java-action
-      - uses: *setup-sbt-action
-      - uses: *cache-action
+      - *checkout-action
+      - *setup-java-action
+      - *setup-sbt-action
+      - *cache-action
       - name: Organisation secrets
         run: |
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
@@ -58,10 +62,10 @@ jobs:
       SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
     runs-on: ubuntu-latest
     steps:
-      - uses: *checkout-action
-      - uses: *setup-java-action
-      - uses: *setup-sbt-action
-      - uses: *cache-action
+      - *checkout-action
+      - *setup-java-action
+      - *setup-sbt-action
+      - *cache-action
       - name: Organisation secrets
         run: |
           echo "MAVEN_CENTRAL_TOKEN_USER starts with ${MC_TOKEN_USER:0:1} and is ${#MC_TOKEN_USER} long"
