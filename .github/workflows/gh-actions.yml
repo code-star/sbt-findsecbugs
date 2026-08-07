@@ -62,7 +62,9 @@ jobs:
       SBT_OPTS: "-Xms512M -Xmx1536M -Xss1M"
     runs-on: ubuntu-latest
     steps:
-      - *checkout-action
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Fetch all history for all tags and branches
       - *setup-java-action
       - *setup-sbt-action
       - *cache-action
